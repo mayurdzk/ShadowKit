@@ -11,7 +11,7 @@ import UIKit
 extension UIImage{
     
     /// Call this method on a UIImage to its shadow blurred image called in a completion handler.
-    /// The completion handler will be called asynchronously on the main thread.
+    /// The completion handler will be called asynchronously and on the main thread.
     ///
     /// - Parameter completionHandler: A callback recieved with the shadowblurred image as a parameter
     public func applyingShadowBlur(_ completionHandler: @escaping (UIImage) -> Void) {
@@ -22,7 +22,7 @@ extension UIImage{
 }
 
 extension UIImageView{
-    public func applyingShadowBlueToImage(_ completionHandler: @escaping (UIImage?) -> Void) {
+    public func withShadowBlurApplied(_ completionHandler: @escaping (UIImage?) -> Void) {
         guard let image = self.image else { completionHandler(nil); return }
         
         applyBlurEffect(to: image) { (shadowBlurredImage) in
