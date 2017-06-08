@@ -5,7 +5,6 @@
 //  Created by Mayur on 03/04/17.
 //  Copyright © 2017 Mayur. All rights reserved.
 //
-
 import UIKit
 
 extension UIImage{

@@ -21,7 +21,7 @@ enum ShadowInput {
 
 func shadowMaker(input: ShadowInput) -> UIImage {
 	switch input {
-    case .view(view: let _):
+    case .view(view: _):
 		return UIImage()
 	case .image(image: let image):
 		print(image)
