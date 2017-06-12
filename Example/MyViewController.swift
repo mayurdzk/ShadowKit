@@ -6,8 +6,6 @@
 //  Copyright © 2016 Robin Malhotra. All rights reserved.
 //
 
-//: Playground - noun: a place where people can play
-
 import UIKit
 import CoreImage
 import ShadowKit
@@ -64,4 +62,3 @@ class MyViewController: UIViewController {
         })
 	}
 }
-

@@ -33,7 +33,7 @@ extension UIImage{
     /// Call this method on a UIImage to have its shadow blurred image called in a completion handler.
     /// The completion handler will be called asynchronously and on the main thread.
     ///
-    /// - Parameter completionHandler: A callback recieved with the shadowblurred image as a parameter
+    /// - Parameter completionHandler: Your completion handler is called on the main thread with the shadow blur effect applied to your image. If something goes wrong while constructing, or applying the blur, your completion handler is called with nil.
     public func applyingShadowBlur(_ completionHandler: @escaping (UIImage?) -> Void) {
         applyingBlurEffect(to: self) { (shadowBlurredImage) in
             completionHandler(shadowBlurredImage)
@@ -41,7 +41,9 @@ extension UIImage{
     }
 }
 
-extension UIImageView{
+/*
+ //This method is probably not needed since the caller can simply write `imageView.image?.applyingShadowBlur(_:)`
+extension UIImageView {
     //TODO: Doccumentation
     public func withShadowBlurApplied(_ completionHandler: @escaping (UIImage?) -> Void) {
         guard let image = self.image else { completionHandler(nil); return }
@@ -51,11 +53,39 @@ extension UIImageView{
         }
     }
 }
+ */
 
 //TODO: Have an extension on UIImageView that automatically populates the blurred image behind the current image and returns. (Maybe ask for an animation?)
-//TODO: Have an extension on a UIView that takes a 'screenshot' of the current view and returns a blurred image of that view (asynchronously)
 
-//TODO: Doccumentation
+extension UIView {
+    
+    /// Call this method on a UIView to render it into a UIImage and have your completionHandler called on the main thread with the shadowblurred image.
+    ///
+    /// Make sure you call this method on the main thread since rendering a view into a screenshot needs to be done on the main thread.
+    ///
+    /// - Parameter completionHandler: Your completion handler is called on the main thread with the shadow blur effect applied to your image. If something goes wrong while constructing, or applying the blur, your completion handler is called with nil.
+    public func withAppliedShadowBlur(_ completionHandler: @escaping (UIImage?) -> Void) {
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, true, 0.0)
+        self.drawHierarchy(in: self.bounds, afterScreenUpdates: true)
+        let viewAsImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        guard let image = viewAsImage else {
+            completionHandler(nil)
+            return
+        }
+        
+        applyingBlurEffect(to: image) { (shadowBlurredImage) in
+            completionHandler(shadowBlurredImage)
+        }
+    }
+}
+
+
+/// Takes an image and a completionHandler as a parameter and performs the Shadow Blur image operations on a background thread. Once the operations are over, the completionHandler is called on the main thread with an image that has the shadow blur applied
+///
+/// - Parameters:
+///   - image: The image you'd like to apply the shadow blur effect to
+///   - completionHander: Your completion handler is called on the main thread with an image that has the shadow blur effect applied to it. If something goes wrong when applying the effect, the completionHandler will be called with nil.
 func applyingBlurEffect(to image: UIImage, completionHander: @escaping (UIImage?) -> Void) {
     DispatchQueue.global(qos: .userInteractive).async {
         let blurredImage = applyBlurEffect(to: image)
@@ -68,9 +98,12 @@ func applyingBlurEffect(to image: UIImage, completionHander: @escaping (UIImage?
     }
 }
 
-//TODO: Doccumentation
+
+/// Call this method with an image to which you'd like to apply the shadow blur effect
+///
+/// - Parameter image:
+/// - Returns: Returns an image with the shadow blur effect applied. If any of the operations in the process failed, this method returns nil.
 func applyBlurEffect(to image: UIImage) -> UIImage? {
-    //TODO: Remove all forced-downcasts
     let context = CIContext(options: nil)
     guard let imageToBlur = CIImage(image: image) else { return nil }
     guard let blurfilter = CIFilter(name: "CIGaussianBlur") else { return nil }
